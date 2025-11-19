@@ -5,7 +5,7 @@
     "variables": ["angka", "hurufA", "hurufB"]
   },
   {
-    "template": "Jika data {huruf} di {angka} meningkat 10% ke angka berikutnya, berapa nilainya?",
+    "template": "Jika data {huruf} di {angka} meningkat 20% ke angka berikutnya, berapa nilainya?",
     "type": "projectedIncrease",
     "variables": ["angka", "huruf"]
   },
@@ -15,7 +15,7 @@
     "variables": ["huruf", "angka"]
   },
   {
-    "template": "Jika {huruf} mengalami penurunan 20% sejak {angka1}, berapa nilai di {angka2}?",
+    "template": "Jika {huruf} mengalami penurunan 30% sejak {angka1}, berapa nilai di {angka2}?",
     "type": "percentDecrease",
     "variables": ["huruf", "angka1", "angka2"]
   },
@@ -25,7 +25,7 @@
     "variables": ["huruf"]
   },
   {
-    "template": "Jika data {huruf} di {angka} dikurangi 15%, berapa nilainya?",
+    "template": "Jika data {huruf} di {angka} dikurangi 40%, berapa nilainya?",
     "type": "percentReduction",
     "variables": ["huruf", "angka"]
   },

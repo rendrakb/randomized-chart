@@ -98,7 +98,7 @@ function generateQuestion() {
         getValue(vars.hurufA, vars.angka) - getValue(vars.hurufB, vars.angka);
       break;
     case "projectedIncrease":
-      currentAnswer = Math.round(getValue(vars.huruf, vars.angka) * 1.1);
+      currentAnswer = Math.round(getValue(vars.huruf, vars.angka) * 1.2);
       break;
     case "percentageOfTotal":
       const total = hurufs.reduce((sum, c) => sum + getValue(c, vars.angka), 0);
@@ -107,7 +107,7 @@ function generateQuestion() {
         : "0%";
       break;
     case "percentDecrease":
-      currentAnswer = Math.round(getValue(vars.huruf, vars.angka1) * 0.8);
+      currentAnswer = Math.round(getValue(vars.huruf, vars.angka1) * 0.7);
       break;
     case "totalOverangkas":
       currentAnswer = angkas.reduce(
@@ -116,7 +116,7 @@ function generateQuestion() {
       );
       break;
     case "percentReduction":
-      currentAnswer = Math.round(getValue(vars.huruf, vars.angka) * 0.85);
+      currentAnswer = Math.round(getValue(vars.huruf, vars.angka) * 0.6);
       break;
     case "averageOverangkas":
       currentAnswer = Math.round(
