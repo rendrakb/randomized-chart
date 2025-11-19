@@ -2,74 +2,74 @@ let questionTemplates = [];
 let currentQuestion = null;
 let currentAnswer = null;
 
-const ctx = document.getElementById('myChart').getContext('2d');
+const ctx = document.getElementById("chart").getContext("2d");
 
-const countries = ['Jerman', 'Inggris', 'Prancis', 'Italia', 'Belanda'];
-const years = ['Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4'];
+const hurufs = ["A", "B", "C", "D", "E"];
+const angkas = ["1", "2", "3", "4"];
 
 const getRandomData = () =>
-  Array.from({ length: years.length }, () => Math.floor(Math.random() * 11) * 100);
+  Array.from(
+    { length: angkas.length },
+    () => Math.floor(Math.random() * 11) * 100
+  );
 
 const generateDatasets = () =>
-  countries.map((country, index) => ({
-    label: country,
+  hurufs.map((huruf, index) => ({
+    label: huruf,
     data: getRandomData(),
-    borderColor: `hsl(${index * 72}, 70%, 50%)`,
-    fill: false
+    borderColor: `hsl(${index * 100}, 50%, 50%)`,
+    fill: false,
   }));
 
+Chart.defaults.color = "#fff";
+Chart.defaults.borderColor = "#3c3c3c";
+
 const chart = new Chart(ctx, {
-  type: 'line',
+  type: "line",
   data: {
-    labels: years,
-    datasets: generateDatasets()
+    labels: angkas,
+    datasets: generateDatasets(),
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      title: {
-        display: true,
-        text: 'Data'
+      legend: {
+        labels: {
+          boxWidth: 12,
+          boxHeight: 12,
+          padding: 10,
+        }
       }
     },
     scales: {
       y: {
         title: {
           display: true,
-          text: 'Angka'
         },
-        beginAtZero: true,
-        max: 1000
+        beginAtZero: false,
+        max: 1000,
       },
       x: {
         title: {
           display: true,
-          text: 'Tahun'
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 });
 
-document.getElementById('randomizeButton').addEventListener('click', () => {
-  chart.data.datasets.forEach(dataset => {
-    dataset.data = getRandomData();
-  });
-  chart.update();
-  generateQuestion();
-});
-
-fetch('q.json')
-  .then(res => res.json())
-  .then(data => {
+fetch("q.json")
+  .then((res) => res.json())
+  .then((data) => {
     questionTemplates = data;
     generateQuestion();
   });
 
-function getValue(country, year) {
-  const dataset = chart.data.datasets.find(d => d.label === country);
-  const yearIndex = years.indexOf(year);
-  return dataset?.data[yearIndex] ?? 0;
+function getValue(huruf, angka) {
+  const dataset = chart.data.datasets.find((d) => d.label === huruf);
+  const angkaIndex = angkas.indexOf(angka);
+  return dataset?.data[angkaIndex] ?? 0;
 }
 
 function pick(arr) {
@@ -82,45 +82,54 @@ function generateQuestion() {
   const templateObj = pick(questionTemplates);
   const vars = {};
 
-  templateObj.variables.forEach(v => {
-    if (v.startsWith('country')) vars[v] = pick(countries);
-    if (v.startsWith('year')) vars[v] = pick(years);
+  templateObj.variables.forEach((v) => {
+    if (v.startsWith("huruf")) vars[v] = pick(hurufs);
+    if (v.startsWith("angka")) vars[v] = pick(angkas);
   });
 
-  if (vars.countryA === vars.countryB) {
-    vars.countryB = countries.find(c => c !== vars.countryA);
+  if (vars.hurufA === vars.hurufB) {
+    vars.hurufB = hurufs.find((c) => c !== vars.hurufA);
   }
 
   switch (templateObj.type) {
-    case 'difference':
-      currentAnswer = getValue(vars.countryA, vars.year) - getValue(vars.countryB, vars.year);
+    case "difference":
+      currentAnswer =
+        getValue(vars.hurufA, vars.angka) - getValue(vars.hurufB, vars.angka);
       break;
-    case 'projectedIncrease':
-      currentAnswer = Math.round(getValue(vars.country, vars.year) * 1.1);
+    case "projectedIncrease":
+      currentAnswer = Math.round(getValue(vars.huruf, vars.angka) * 1.1);
       break;
-    case 'percentageOfTotal':
-      const total = countries.reduce((sum, c) => sum + getValue(c, vars.year), 0);
-      currentAnswer = total ? Math.round((getValue(vars.country, vars.year) / total) * 100) + '%' : '0%';
+    case "percentageOfTotal":
+      const total = hurufs.reduce((sum, c) => sum + getValue(c, vars.angka), 0);
+      currentAnswer = total
+        ? Math.round((getValue(vars.huruf, vars.angka) / total) * 100) + "%"
+        : "0%";
       break;
-    case 'percentDecrease':
-      currentAnswer = Math.round(getValue(vars.country, vars.year1) * 0.8);
+    case "percentDecrease":
+      currentAnswer = Math.round(getValue(vars.huruf, vars.angka1) * 0.8);
       break;
-    case 'totalOverYears':
-      currentAnswer = years.reduce((sum, y) => sum + getValue(vars.country, y), 0);
+    case "totalOverangkas":
+      currentAnswer = angkas.reduce(
+        (sum, y) => sum + getValue(vars.huruf, y),
+        0
+      );
       break;
-    case 'percentReduction':
-      currentAnswer = Math.round(getValue(vars.country, vars.year) * 0.85);
+    case "percentReduction":
+      currentAnswer = Math.round(getValue(vars.huruf, vars.angka) * 0.85);
       break;
-    case 'averageOverYears':
-      currentAnswer = Math.round(years.reduce((sum, y) => sum + getValue(vars.country, y), 0) / years.length);
+    case "averageOverangkas":
+      currentAnswer = Math.round(
+        angkas.reduce((sum, y) => sum + getValue(vars.huruf, y), 0) /
+          angkas.length
+      );
       break;
-    case 'bestPerformer':
-      const totals = chart.data.datasets.map(d => ({
-        country: d.label,
-        total: d.data.reduce((a, b) => a + b, 0)
+    case "bestPerformer":
+      const totals = chart.data.datasets.map((d) => ({
+        huruf: d.label,
+        total: d.data.reduce((a, b) => a + b, 0),
       }));
       totals.sort((a, b) => b.total - a.total);
-      currentAnswer = totals[0].country;
+      currentAnswer = totals[0].huruf;
       break;
   }
 
@@ -129,14 +138,26 @@ function generateQuestion() {
     currentQuestion = currentQuestion.replace(`{${key}}`, val);
   });
 
-  document.querySelector('.questions').innerHTML = `<strong>${currentQuestion}</strong><br><div id="answer" style="display:none;">Jawaban: ${currentAnswer}</div>`;
+  document.querySelector(
+    ".questions"
+  ).innerHTML = `<strong>${currentQuestion}</strong><br><div id="answer" style="display:none;">Jawaban: ${currentAnswer}</div>`;
 }
 
-document.getElementById('questionButton').addEventListener('click', generateQuestion);
+document
+  .getElementById("questionButton")
+  .addEventListener("click", generateQuestion);
 
-document.getElementById('answerButton').addEventListener('click', () => {
-  const answerDiv = document.getElementById('answer');
+document.getElementById("answerButton").addEventListener("click", () => {
+  const answerDiv = document.getElementById("answer");
   if (answerDiv) {
-    answerDiv.style.display = 'block';
+    answerDiv.style.display = "block";
   }
+});
+
+document.getElementById("randomizeButton").addEventListener("click", () => {
+  chart.data.datasets.forEach((dataset) => {
+    dataset.data = getRandomData();
+  });
+  chart.update();
+  generateQuestion();
 });

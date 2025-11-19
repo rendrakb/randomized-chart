@@ -1,17 +1,37 @@
 body {
-    max-width: 80vw;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 100vw;
+  background-color: #4c4c4c;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  color: white;
 }
 
-.container {
-    font-size: 1em;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-}
-
+#answerButton,
+#questionButton,
 #randomizeButton {
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
+  margin: 20px 10px;
+}
+
+.questions {
+  margin: 20px;
+}
+
+#chart-container {
+  width: 80vw;
+  height: 60vh;
+  aspect-ratio: 4 / 2;
+}
+
+@media (max-width: 768px) {
+  #chart-container {
+    width: 90vw;
+    height: 60vh;
+    aspect-ratio: 2 / 4;
+  }
 }

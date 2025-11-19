@@ -1,65 +1,42 @@
 [
-    {
-        "template": "Dalam {year}, berapa selisih antara {countryA} dan {countryB}?",
-        "type": "difference",
-        "variables": [
-            "year",
-            "countryA",
-            "countryB"
-        ]
-    },
-    {
-        "template": "Jika data {country} di {year} meningkat 10% tahun berikutnya, berapa nilainya?",
-        "type": "projectedIncrease",
-        "variables": [
-            "year",
-            "country"
-        ]
-    },
-    {
-        "template": "Berapa persen kontribusi {country} dibanding total semua negara pada {year}?",
-        "type": "percentageOfTotal",
-        "variables": [
-            "country",
-            "year"
-        ]
-    },
-    {
-        "template": "Jika {country} mengalami penurunan 20% dari {year1} ke {year2}, berapa nilai di {year2}?",
-        "type": "percentDecrease",
-        "variables": [
-            "country",
-            "year1",
-            "year2"
-        ]
-    },
-    {
-        "template": "Berapa total data yang dimiliki {country} selama empat tahun?",
-        "type": "totalOverYears",
-        "variables": [
-            "country"
-        ]
-    },
-    {
-        "template": "Jika data {country} di {year} dikurangi 15%, berapa nilainya?",
-        "type": "percentReduction",
-        "variables": [
-            "country",
-            "year"
-        ]
-    },
-    {
-        "template": "Berapa rata-rata data {country} selama empat tahun?",
-        "type": "averageOverYears",
-        "variables": [
-            "country"
-        ]
-    },
-        {
-        "template": "Negara mana yang memiliki performa tertinggi?",
-        "type": "bestPerformer",
-        "variables": [
-            "country"
-        ]
-    }
+  {
+    "template": "Dalam {angka}, berapa selisih antara {hurufA} dan {hurufB}?",
+    "type": "difference",
+    "variables": ["angka", "hurufA", "hurufB"]
+  },
+  {
+    "template": "Jika data {huruf} di {angka} meningkat 10% ke angka berikutnya, berapa nilainya?",
+    "type": "projectedIncrease",
+    "variables": ["angka", "huruf"]
+  },
+  {
+    "template": "Berapa persen kontribusi {huruf} dibanding total semua Huruf pada {angka}?",
+    "type": "percentageOfTotal",
+    "variables": ["huruf", "angka"]
+  },
+  {
+    "template": "Jika {huruf} mengalami penurunan 20% sejak {angka1}, berapa nilai di {angka2}?",
+    "type": "percentDecrease",
+    "variables": ["huruf", "angka1", "angka2"]
+  },
+  {
+    "template": "Berapa total data yang dimiliki {huruf} selama empat angka?",
+    "type": "totalOverangkas",
+    "variables": ["huruf"]
+  },
+  {
+    "template": "Jika data {huruf} di {angka} dikurangi 15%, berapa nilainya?",
+    "type": "percentReduction",
+    "variables": ["huruf", "angka"]
+  },
+  {
+    "template": "Berapa rata-rata data {huruf} selama empat angka?",
+    "type": "averageOverangkas",
+    "variables": ["huruf"]
+  },
+  {
+    "template": "Huruf mana yang memiliki performa tertinggi?",
+    "type": "bestPerformer",
+    "variables": ["huruf"]
+  }
 ]
