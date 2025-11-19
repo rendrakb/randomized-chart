@@ -38,5 +38,10 @@
     "template": "Huruf mana yang memiliki performa tertinggi?",
     "type": "bestPerformer",
     "variables": ["huruf"]
+  },
+  {
+    "template": "Huruf mana yang memiliki performa terburuk?",
+    "type": "worstPerformer",
+    "variables": ["huruf"]
   }
 ]

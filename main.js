@@ -39,8 +39,8 @@ const chart = new Chart(ctx, {
           boxWidth: 12,
           boxHeight: 12,
           padding: 10,
-        }
-      }
+        },
+      },
     },
     scales: {
       y: {
@@ -131,6 +131,14 @@ function generateQuestion() {
       }));
       totals.sort((a, b) => b.total - a.total);
       currentAnswer = totals[0].huruf;
+      break;
+    case "worstPerformer":
+      const totalsW = chart.data.datasets.map((d) => ({
+        huruf: d.label,
+        total: d.data.reduce((a, b) => a + b, 0),
+      }));
+      totalsW.sort((a, b) => a.total - b.total);
+      currentAnswer = totalsW[0].huruf;
       break;
   }
 
