@@ -47,8 +47,9 @@ const chart = new Chart(ctx, {
         title: {
           display: true,
         },
-        beginAtZero: false,
+        beginAtZero: true,
         max: 1000,
+        suggestedMax: 1000,
       },
       x: {
         title: {
