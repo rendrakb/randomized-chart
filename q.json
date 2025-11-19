@@ -1,0 +1,65 @@
+[
+    {
+        "template": "Dalam {year}, berapa selisih antara {countryA} dan {countryB}?",
+        "type": "difference",
+        "variables": [
+            "year",
+            "countryA",
+            "countryB"
+        ]
+    },
+    {
+        "template": "Jika data {country} di {year} meningkat 10% tahun berikutnya, berapa nilainya?",
+        "type": "projectedIncrease",
+        "variables": [
+            "year",
+            "country"
+        ]
+    },
+    {
+        "template": "Berapa persen kontribusi {country} dibanding total semua negara pada {year}?",
+        "type": "percentageOfTotal",
+        "variables": [
+            "country",
+            "year"
+        ]
+    },
+    {
+        "template": "Jika {country} mengalami penurunan 20% dari {year1} ke {year2}, berapa nilai di {year2}?",
+        "type": "percentDecrease",
+        "variables": [
+            "country",
+            "year1",
+            "year2"
+        ]
+    },
+    {
+        "template": "Berapa total data yang dimiliki {country} selama empat tahun?",
+        "type": "totalOverYears",
+        "variables": [
+            "country"
+        ]
+    },
+    {
+        "template": "Jika data {country} di {year} dikurangi 15%, berapa nilainya?",
+        "type": "percentReduction",
+        "variables": [
+            "country",
+            "year"
+        ]
+    },
+    {
+        "template": "Berapa rata-rata data {country} selama empat tahun?",
+        "type": "averageOverYears",
+        "variables": [
+            "country"
+        ]
+    },
+        {
+        "template": "Negara mana yang memiliki performa tertinggi?",
+        "type": "bestPerformer",
+        "variables": [
+            "country"
+        ]
+    }
+]

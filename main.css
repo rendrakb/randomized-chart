@@ -1,0 +1,17 @@
+body {
+    max-width: 80vw;
+}
+
+.container {
+    font-size: 1em;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+#randomizeButton {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
