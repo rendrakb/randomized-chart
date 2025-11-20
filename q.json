@@ -5,14 +5,14 @@
     "variables": ["number", "letterA", "letterB"]
   },
   {
+    "template": "In {number}, what is the sum of {letterA} & {letterB}?",
+    "type": "sum",
+    "variables": ["number", "letterA", "letterB"]
+  },
+  {
     "template": "If the value of {letter} in {number} increases by 20% in the next number, what will it be?",
     "type": "projectedIncrease",
     "variables": ["number", "letter"]
-  },
-  {
-    "template": "What percentage does {letter} contribute compared to the total of all letters in {number}?",
-    "type": "percentageOfTotal",
-    "variables": ["letter", "number"]
   },
   {
     "template": "If {letter} decreases by 30% since {number}, what is the value in the next number?",
@@ -20,14 +20,19 @@
     "variables": ["letter", "number"]
   },
   {
-    "template": "What is the total value of {letter} across all numbers?",
-    "type": "totalOvernumbers",
-    "variables": ["letter"]
-  },
-  {
     "template": "If the value of {letter} in {number} is reduced by 40%, what will it be?",
     "type": "percentReduction",
     "variables": ["letter", "number"]
+  },
+  {
+    "template": "What percentage does {letter} contribute compared to the total of all letters in {number}?",
+    "type": "percentageOfTotal",
+    "variables": ["letter", "number"]
+  },
+  {
+    "template": "What is the total value of {letter} across all numbers?",
+    "type": "totalOvernumbers",
+    "variables": ["letter"]
   },
   {
     "template": "What is the average value of {letter} across all numbers?",

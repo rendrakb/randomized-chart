@@ -104,8 +104,19 @@ function generateQuestion() {
         getValue(vars.letterA, vars.number) -
         getValue(vars.letterB, vars.number);
       break;
+    case "sum":
+      currentAnswer =
+        getValue(vars.letterA, vars.number) +
+        getValue(vars.letterB, vars.number);
+      break;
     case "projectedIncrease":
       currentAnswer = Math.round(getValue(vars.letter, vars.number) * 1.2);
+      break;
+    case "percentDecrease":
+      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 0.7);
+      break;
+    case "percentReduction":
+      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 0.6);
       break;
     case "percentageOfTotal":
       const total = letters.reduce(
@@ -116,17 +127,11 @@ function generateQuestion() {
         ? Math.round((getValue(vars.letter, vars.number) / total) * 100) + "%"
         : "0%";
       break;
-    case "percentDecrease":
-      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 0.7);
-      break;
     case "totalOvernumbers":
       currentAnswer = numbers.reduce(
         (sum, y) => sum + getValue(vars.letter, y),
         0
       );
-      break;
-    case "percentReduction":
-      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 0.6);
       break;
     case "averageOvernumbers":
       currentAnswer = Math.round(
@@ -166,7 +171,7 @@ function generateQuestion() {
   document.getElementById("feedback").style.color = "";
 }
 
-document
+document;
 document.getElementById("questionButton").addEventListener("click", () => {
   generateQuestion();
   document.getElementById("answerInput").value = "";
@@ -188,7 +193,6 @@ document.getElementById("randomizeButton").addEventListener("click", () => {
   chart.update();
   generateQuestion();
 
-  
   document.getElementById("answerInput").value = "";
   document.getElementById("feedback").textContent = "";
   document.getElementById("feedback").style.color = "";
@@ -222,8 +226,9 @@ document.getElementById("submitAnswerButton").addEventListener("click", () => {
   let isCorrect = user === correct;
   if (isCorrect) correctCount++;
 
-  document.getElementById("score").textContent =
-    `Score : ${correctCount}/${totalAttempts}`;
+  document.getElementById(
+    "score"
+  ).textContent = `Score : ${correctCount}/${totalAttempts}`;
 
   const now = Date.now();
   if (lastSubmitTime) {
@@ -234,10 +239,10 @@ document.getElementById("submitAnswerButton").addEventListener("click", () => {
   lastSubmitTime = now;
 
   if (isCorrect) {
-    feedback.textContent = "Correct!";
+    feedback.textContent = "Correct";
     feedback.style.color = "lightgreen";
   } else {
-    feedback.textContent = `Wrong! Correct answer: ${currentAnswer}`;
+    feedback.textContent = `Wrong, it's: ${currentAnswer}`;
     feedback.style.color = "red";
   }
 });
