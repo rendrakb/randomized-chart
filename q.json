@@ -1,47 +1,47 @@
 [
   {
-    "template": "Dalam {angka}, berapa selisih antara {hurufA} dan {hurufB}?",
+    "template": "In {number}, what is the difference between {letterA} & {letterB}?",
     "type": "difference",
-    "variables": ["angka", "hurufA", "hurufB"]
+    "variables": ["number", "letterA", "letterB"]
   },
   {
-    "template": "Jika data {huruf} di {angka} meningkat 20% ke angka berikutnya, berapa nilainya?",
+    "template": "If the value of {letter} in {number} increases by 20% in the next number, what will it be?",
     "type": "projectedIncrease",
-    "variables": ["angka", "huruf"]
+    "variables": ["number", "letter"]
   },
   {
-    "template": "Berapa persen kontribusi {huruf} dibanding total semua Huruf pada {angka}?",
+    "template": "What percentage does {letter} contribute compared to the total of all letters in {number}?",
     "type": "percentageOfTotal",
-    "variables": ["huruf", "angka"]
+    "variables": ["letter", "number"]
   },
   {
-    "template": "Jika {huruf} mengalami penurunan 30% sejak {angka1}, berapa nilai di {angka2}?",
+    "template": "If {letter} decreases by 30% since {number}, what is the value in the next number?",
     "type": "percentDecrease",
-    "variables": ["huruf", "angka1", "angka2"]
+    "variables": ["letter", "number"]
   },
   {
-    "template": "Berapa total data yang dimiliki {huruf} selama empat angka?",
-    "type": "totalOverangkas",
-    "variables": ["huruf"]
+    "template": "What is the total value of {letter} across all numbers?",
+    "type": "totalOvernumbers",
+    "variables": ["letter"]
   },
   {
-    "template": "Jika data {huruf} di {angka} dikurangi 40%, berapa nilainya?",
+    "template": "If the value of {letter} in {number} is reduced by 40%, what will it be?",
     "type": "percentReduction",
-    "variables": ["huruf", "angka"]
+    "variables": ["letter", "number"]
   },
   {
-    "template": "Berapa rata-rata data {huruf} selama empat angka?",
-    "type": "averageOverangkas",
-    "variables": ["huruf"]
+    "template": "What is the average value of {letter} across all numbers?",
+    "type": "averageOvernumbers",
+    "variables": ["letter"]
   },
   {
-    "template": "Huruf mana yang memiliki performa tertinggi?",
+    "template": "Which letter has the highest performance?",
     "type": "bestPerformer",
-    "variables": ["huruf"]
+    "variables": ["letter"]
   },
   {
-    "template": "Huruf mana yang memiliki performa terburuk?",
+    "template": "Which letter has the lowest performance?",
     "type": "worstPerformer",
-    "variables": ["huruf"]
+    "variables": ["letter"]
   }
 ]

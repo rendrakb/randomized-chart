@@ -13,10 +13,20 @@
         <canvas id="chart"></canvas>
       </div>
       <div class="questions"></div>
+      <div class="answer">
+        <input type="text" id="answerInput" placeholder="Your answer">
+        <button id="submitAnswerButton">Check Answer</button>
+        <span id="feedback"></span>
+      </div>
       <div id="buttons">
         <button id="answerButton">Show Answer</button>
         <button id="questionButton">Change Question</button>
         <button id="randomizeButton">Randomize Data</button>
+      </div>
+      <div id="infos">
+        <div id="last-time">Last time spent : 00:00</div>
+        <div id="total-time">Total time spent : 00:00</div>
+        <div id="score">Score : 0/0</div>
       </div>
     </div>
     <script src="main.js"></script>
