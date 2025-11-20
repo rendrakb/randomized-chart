@@ -13,11 +13,16 @@ body {
   background: #2a2a2a;
   border-radius: 4px;
   min-height: 50px;
+  max-width: 500px;
+  text-wrap: wrap;
 }
 
 #chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 80vw;
-  max-width: 500px;
+  max-width: 450px;
   height: 60vh;
   aspect-ratio: 4 / 2;
 }
@@ -65,6 +70,7 @@ button:hover {
 
 #answerInput {
   padding: 3px;
+  padding-left: 10px;
   margin-right: 10px;
   font-size: 1em;
   width: 150px;
