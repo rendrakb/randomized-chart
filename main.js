@@ -27,6 +27,7 @@ const state = {
   lastSubmitTime: null,
   correctCount: 0,
   totalAttempts: 0,
+  currentQuestionSubmitted: false,
 };
 
 class ChartManager {
@@ -410,8 +411,12 @@ class QuizApp {
   }
 
   generateNewQuestion() {
-    const { question, answer } = this.questionGenerator.generate();
-    this.uiController.displayQuestion(question, answer);
+    const result = this.questionGenerator.generate();
+    if (result) {
+      this.uiController.displayQuestion(result.question, result.answer);
+
+      state.currentQuestionSubmitted = false;
+    }
   }
 
   handleRandomize() {
@@ -420,6 +425,8 @@ class QuizApp {
   }
 
   handleSubmit() {
+    if (state.currentQuestionSubmitted) return;
+
     const userAnswer = this.uiController.getUserAnswer();
     const isCorrect = AnswerValidator.isCorrect(
       userAnswer,
@@ -438,6 +445,8 @@ class QuizApp {
       this.uiController.updateLastTime(elapsedSeconds);
     }
     state.lastSubmitTime = now;
+
+    state.currentQuestionSubmitted = true;
   }
 }
 
