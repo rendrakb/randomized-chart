@@ -1,264 +1,449 @@
-let questionTemplates = [];
-let currentQuestion = null;
-let currentAnswer = null;
-
-let pageStartTime = Date.now();
-let lastSubmitTime = null;
-
-let correctCount = 0;
-let totalAttempts = 0;
-
-const ctx = document.getElementById("chart").getContext("2d");
-
-const letters = ["A", "B", "C", "D", "E"];
-const numbers = ["1", "2", "3", "4"];
-
-const getRandomData = () =>
-  Array.from(
-    { length: numbers.length },
-    () => Math.floor(Math.random() * 11) * 100
-  );
-
-const generateDatasets = () =>
-  letters.map((letter, index) => ({
-    label: letter,
-    data: getRandomData(),
-    borderColor: `hsl(${index * 100}, 50%, 50%)`,
-    fill: false,
-  }));
-
-Chart.defaults.color = "#fff";
-Chart.defaults.borderColor = "#3c3c3c";
-
-const chart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: numbers,
-    datasets: generateDatasets(),
+const CONFIG = {
+  CHART: {
+    LETTERS: ["A", "B", "C", "D", "E"],
+    NUMBERS: ["1", "2", "3", "4"],
+    MAX_VALUE: 1000,
+    VALUE_STEP: 100,
+    HUE_STEP: 100,
   },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        labels: {
-          boxWidth: 12,
-          boxHeight: 12,
-          padding: 10,
-        },
-      },
-    },
-    scales: {
-      y: {
-        title: {
-          display: true,
-        },
-        beginAtZero: true,
-        max: 1000,
-        suggestedMax: 1000,
-      },
-      x: {
-        title: {
-          display: true,
-        },
-      },
-    },
+  COLORS: {
+    TEXT: "#fff",
+    BORDER: "#3c3c3c",
+    CORRECT: "lightgreen",
+    INCORRECT: "red",
   },
-});
+  PERCENTAGES: {
+    PROJECTED_INCREASE: 1.2,
+    PERCENT_DECREASE: 0.7,
+    PERCENT_REDUCTION: 0.6,
+  },
+};
 
-fetch("q.json")
-  .then((res) => res.json())
-  .then((data) => {
-    questionTemplates = data;
-    generateQuestion();
-  });
+const state = {
+  questionTemplates: [],
+  currentQuestion: null,
+  currentAnswer: null,
+  pageStartTime: Date.now(),
+  lastSubmitTime: null,
+  correctCount: 0,
+  totalAttempts: 0,
+};
 
-function getValue(letter, number) {
-  const dataset = chart.data.datasets.find((d) => d.label === letter);
-  const numberIndex = numbers.indexOf(number);
-  return dataset?.data[numberIndex] ?? 0;
+class ChartManager {
+  constructor(canvasId) {
+    this.ctx = document.getElementById(canvasId).getContext("2d");
+    this.chart = this.initializeChart();
+  }
+
+  initializeChart() {
+    Chart.defaults.color = CONFIG.COLORS.TEXT;
+    Chart.defaults.borderColor = CONFIG.COLORS.BORDER;
+
+    return new Chart(this.ctx, {
+      type: "line",
+      data: {
+        labels: CONFIG.CHART.NUMBERS,
+        datasets: this.generateDatasets(),
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              boxWidth: 12,
+              boxHeight: 12,
+              padding: 10,
+            },
+          },
+        },
+        scales: {
+          y: {
+            title: { display: true },
+            beginAtZero: true,
+            max: CONFIG.CHART.MAX_VALUE,
+            suggestedMax: CONFIG.CHART.MAX_VALUE,
+          },
+          x: {
+            title: { display: true },
+          },
+        },
+      },
+    });
+  }
+
+  generateDatasets() {
+    return CONFIG.CHART.LETTERS.map((letter, index) => ({
+      label: letter,
+      data: this.getRandomData(),
+      borderColor: `hsl(${index * CONFIG.CHART.HUE_STEP}, 50%, 50%)`,
+      fill: false,
+    }));
+  }
+
+  getRandomData() {
+    return Array.from(
+      { length: CONFIG.CHART.NUMBERS.length },
+      () => Math.floor(Math.random() * 11) * CONFIG.CHART.VALUE_STEP
+    );
+  }
+
+  getValue(letter, number) {
+    const dataset = this.chart.data.datasets.find((d) => d.label === letter);
+    const numberIndex = CONFIG.CHART.NUMBERS.indexOf(number);
+    return dataset?.data[numberIndex] ?? 0;
+  }
+
+  randomize() {
+    this.chart.data.datasets.forEach((dataset) => {
+      dataset.data = this.getRandomData();
+    });
+    this.chart.update();
+  }
+
+  getDatasets() {
+    return this.chart.data.datasets;
+  }
 }
 
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+class QuestionGenerator {
+  constructor(chartManager) {
+    this.chartManager = chartManager;
+  }
+
+  static pickRandom(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
+  generateVariables(variableNames) {
+    const vars = {};
+
+    variableNames.forEach((varName) => {
+      if (varName.startsWith("letter")) {
+        vars[varName] = QuestionGenerator.pickRandom(CONFIG.CHART.LETTERS);
+      }
+      if (varName.startsWith("number")) {
+        vars[varName] = QuestionGenerator.pickRandom(CONFIG.CHART.NUMBERS);
+      }
+    });
+
+    if (vars.letterA && vars.letterB && vars.letterA === vars.letterB) {
+      vars.letterB = CONFIG.CHART.LETTERS.find((c) => c !== vars.letterA);
+    }
+
+    return vars;
+  }
+
+  calculateAnswer(type, vars) {
+    const { letterA, letterB, letter, number } = vars;
+
+    switch (type) {
+      case "difference":
+        return (
+          this.chartManager.getValue(letterA, number) -
+          this.chartManager.getValue(letterB, number)
+        );
+
+      case "sum":
+        return (
+          this.chartManager.getValue(letterA, number) +
+          this.chartManager.getValue(letterB, number)
+        );
+
+      case "projectedIncrease":
+        return Math.round(
+          this.chartManager.getValue(letter, number) *
+            CONFIG.PERCENTAGES.PROJECTED_INCREASE
+        );
+
+      case "percentDecrease":
+        return Math.round(
+          this.chartManager.getValue(letter, number) *
+            CONFIG.PERCENTAGES.PERCENT_DECREASE
+        );
+
+      case "percentReduction":
+        return Math.round(
+          this.chartManager.getValue(letter, number) *
+            CONFIG.PERCENTAGES.PERCENT_REDUCTION
+        );
+
+      case "percentageOfTotal":
+        return this.calculatePercentageOfTotal(letter, number);
+
+      case "totalOvernumbers":
+        return this.calculateTotalOverNumbers(letter);
+
+      case "averageOvernumbers":
+        return this.calculateAverageOverNumbers(letter);
+
+      case "bestPerformer":
+        return this.findBestPerformer();
+
+      case "worstPerformer":
+        return this.findWorstPerformer();
+
+      default:
+        return null;
+    }
+  }
+
+  calculatePercentageOfTotal(letter, number) {
+    const total = CONFIG.CHART.LETTERS.reduce(
+      (sum, c) => sum + this.chartManager.getValue(c, number),
+      0
+    );
+
+    if (total === 0) return "0%";
+
+    const percentage = Math.round(
+      (this.chartManager.getValue(letter, number) / total) * 100
+    );
+    return `${percentage}%`;
+  }
+
+  calculateTotalOverNumbers(letter) {
+    return CONFIG.CHART.NUMBERS.reduce(
+      (sum, num) => sum + this.chartManager.getValue(letter, num),
+      0
+    );
+  }
+
+  calculateAverageOverNumbers(letter) {
+    const total = this.calculateTotalOverNumbers(letter);
+    return Math.round(total / CONFIG.CHART.NUMBERS.length);
+  }
+
+  findBestPerformer() {
+    return this.findPerformer(true);
+  }
+
+  findWorstPerformer() {
+    return this.findPerformer(false);
+  }
+
+  findPerformer(isBest) {
+    const totals = this.chartManager.getDatasets().map((dataset) => ({
+      letter: dataset.label,
+      total: dataset.data.reduce((a, b) => a + b, 0),
+    }));
+
+    totals.sort((a, b) => (isBest ? b.total - a.total : a.total - b.total));
+    return totals[0].letter;
+  }
+
+  generate() {
+    if (!state.questionTemplates.length) {
+      console.warn("No question templates loaded");
+      return;
+    }
+
+    const template = QuestionGenerator.pickRandom(state.questionTemplates);
+    const variables = this.generateVariables(template.variables);
+    const answer = this.calculateAnswer(template.type, variables);
+
+    let questionText = template.template;
+    Object.entries(variables).forEach(([key, value]) => {
+      questionText = questionText.replace(`{${key}}`, value);
+    });
+
+    state.currentQuestion = questionText;
+    state.currentAnswer = answer;
+
+    return { question: questionText, answer };
+  }
 }
 
-function generateQuestion() {
-  if (!questionTemplates.length) return;
-
-  const templateObj = pick(questionTemplates);
-  const vars = {};
-
-  templateObj.variables.forEach((v) => {
-    if (v.startsWith("letter")) vars[v] = pick(letters);
-    if (v.startsWith("number")) vars[v] = pick(numbers);
-  });
-
-  if (vars.letterA === vars.letterB) {
-    vars.letterB = letters.find((c) => c !== vars.letterA);
+class UIController {
+  constructor() {
+    this.elements = {
+      questionDisplay: document.querySelector(".questions"),
+      answerInput: document.getElementById("answerInput"),
+      feedback: document.getElementById("feedback"),
+      answerDiv: document.getElementById("answer"),
+      score: document.getElementById("score"),
+      lastTime: document.getElementById("last-time"),
+      totalTime: document.getElementById("total-time"),
+    };
   }
 
-  switch (templateObj.type) {
-    case "difference":
-      currentAnswer =
-        getValue(vars.letterA, vars.number) -
-        getValue(vars.letterB, vars.number);
-      break;
-    case "sum":
-      currentAnswer =
-        getValue(vars.letterA, vars.number) +
-        getValue(vars.letterB, vars.number);
-      break;
-    case "projectedIncrease":
-      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 1.2);
-      break;
-    case "percentDecrease":
-      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 0.7);
-      break;
-    case "percentReduction":
-      currentAnswer = Math.round(getValue(vars.letter, vars.number) * 0.6);
-      break;
-    case "percentageOfTotal":
-      const total = letters.reduce(
-        (sum, c) => sum + getValue(c, vars.number),
-        0
-      );
-      currentAnswer = total
-        ? Math.round((getValue(vars.letter, vars.number) / total) * 100) + "%"
-        : "0%";
-      break;
-    case "totalOvernumbers":
-      currentAnswer = numbers.reduce(
-        (sum, y) => sum + getValue(vars.letter, y),
-        0
-      );
-      break;
-    case "averageOvernumbers":
-      currentAnswer = Math.round(
-        numbers.reduce((sum, y) => sum + getValue(vars.letter, y), 0) /
-          numbers.length
-      );
-      break;
-    case "bestPerformer":
-      const totals = chart.data.datasets.map((d) => ({
-        letter: d.label,
-        total: d.data.reduce((a, b) => a + b, 0),
-      }));
-      totals.sort((a, b) => b.total - a.total);
-      currentAnswer = totals[0].letter;
-      break;
-    case "worstPerformer":
-      const totalsW = chart.data.datasets.map((d) => ({
-        letter: d.label,
-        total: d.data.reduce((a, b) => a + b, 0),
-      }));
-      totalsW.sort((a, b) => a.total - b.total);
-      currentAnswer = totalsW[0].letter;
-      break;
+  displayQuestion(question, answer) {
+    this.elements.questionDisplay.innerHTML = `
+      <strong>${question}</strong><br>
+      <div id="answer" style="display:none;">Answer: ${answer}</div>
+    `;
+    this.clearInput();
+    this.clearFeedback();
+    this.updateAnswerElement();
   }
 
-  currentQuestion = templateObj.template;
-  Object.entries(vars).forEach(([key, val]) => {
-    currentQuestion = currentQuestion.replace(`{${key}}`, val);
-  });
+  updateAnswerElement() {
+    this.elements.answerDiv = document.getElementById("answer");
+  }
 
-  document.querySelector(
-    ".questions"
-  ).innerHTML = `<strong>${currentQuestion}</strong><br><div id="answer" style="display:none;">Answer: ${currentAnswer}</div>`;
+  clearInput() {
+    this.elements.answerInput.value = "";
+  }
 
-  document.getElementById("answerInput").value = "";
-  document.getElementById("feedback").textContent = "";
-  document.getElementById("feedback").style.color = "";
+  clearFeedback() {
+    this.elements.feedback.textContent = "";
+    this.elements.feedback.style.color = "";
+  }
+
+  showAnswer() {
+    if (this.elements.answerDiv) {
+      this.elements.answerDiv.style.display = "block";
+    }
+  }
+
+  showFeedback(isCorrect) {
+    this.elements.feedback.textContent = isCorrect ? "Correct" : "Wrong";
+    this.elements.feedback.style.color = isCorrect
+      ? CONFIG.COLORS.CORRECT
+      : CONFIG.COLORS.INCORRECT;
+  }
+
+  updateScore() {
+    this.elements.score.textContent = `Score : ${state.correctCount}/${state.totalAttempts}`;
+  }
+
+  updateLastTime(seconds) {
+    this.elements.lastTime.textContent = `Last time spent : ${this.formatTime(
+      seconds
+    )}`;
+  }
+
+  updateTotalTime() {
+    const totalSeconds = (Date.now() - state.pageStartTime) / 1000;
+    this.elements.totalTime.textContent = `Total time spent : ${this.formatTime(
+      totalSeconds
+    )}`;
+  }
+
+  formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(
+      2,
+      "0"
+    )}`;
+  }
+
+  getUserAnswer() {
+    return this.elements.answerInput.value;
+  }
 }
 
-document;
-document.getElementById("questionButton").addEventListener("click", () => {
-  generateQuestion();
-  document.getElementById("answerInput").value = "";
-  document.getElementById("feedback").textContent = "";
-  document.getElementById("feedback").style.color = "";
-});
+class AnswerValidator {
+  static normalize(answer) {
+    if (answer == null) return "";
 
-document.getElementById("answerButton").addEventListener("click", () => {
-  const answerDiv = document.getElementById("answer");
-  if (answerDiv) {
-    answerDiv.style.display = "block";
-  }
-});
+    let normalized = String(answer).trim().toLowerCase();
+    normalized = normalized.replace(/,/g, "");
 
-document.getElementById("randomizeButton").addEventListener("click", () => {
-  chart.data.datasets.forEach((dataset) => {
-    dataset.data = getRandomData();
-  });
-  chart.update();
-  generateQuestion();
+    if (normalized.endsWith("%")) {
+      const num = parseFloat(normalized.replace("%", ""));
+      if (isNaN(num)) return normalized;
+      return `${Math.abs(num)}%`;
+    }
 
-  document.getElementById("answerInput").value = "";
-  document.getElementById("feedback").textContent = "";
-  document.getElementById("feedback").style.color = "";
-});
+    const num = parseFloat(normalized);
+    if (!isNaN(num)) return Math.abs(num);
 
-function normalizeAnswer(ans) {
-  if (ans == null) return "";
-  ans = String(ans).trim().toLowerCase();
-  ans = ans.replace(/,/g, "");
-
-  if (ans.endsWith("%")) {
-    let num = parseFloat(ans.replace("%", ""));
-    if (isNaN(num)) return ans;
-    return Math.abs(num) + "%";
+    return normalized;
   }
 
-  let num = parseFloat(ans);
-  if (!isNaN(num)) return Math.abs(num);
-
-  return ans;
+  static isCorrect(userAnswer, correctAnswer) {
+    const normalizedUser = this.normalize(userAnswer);
+    const normalizedCorrect = this.normalize(correctAnswer);
+    return normalizedUser === normalizedCorrect;
+  }
 }
 
-document.getElementById("submitAnswerButton").addEventListener("click", () => {
-  const userInput = document.getElementById("answerInput").value;
-  const feedback = document.getElementById("feedback");
-
-  const user = normalizeAnswer(userInput);
-  const correct = normalizeAnswer(currentAnswer);
-
-  totalAttempts++;
-  let isCorrect = user === correct;
-  if (isCorrect) correctCount++;
-
-  document.getElementById(
-    "score"
-  ).textContent = `Score : ${correctCount}/${totalAttempts}`;
-
-  const now = Date.now();
-  if (lastSubmitTime) {
-    const diffSec = (now - lastSubmitTime) / 1000;
-    document.getElementById("last-time").textContent =
-      "Last time spent : " + formatTime(diffSec);
+class QuizApp {
+  constructor() {
+    this.chartManager = new ChartManager("chart");
+    this.questionGenerator = new QuestionGenerator(this.chartManager);
+    this.uiController = new UIController();
+    this.initialize();
   }
-  lastSubmitTime = now;
 
-  if (isCorrect) {
-    feedback.textContent = "Correct";
-    feedback.style.color = "lightgreen";
-  } else {
-    feedback.textContent = "Wrong";
-    feedback.style.color = "red";
+  async initialize() {
+    await this.loadQuestionTemplates();
+    this.setupEventListeners();
+    this.startTimers();
+    this.generateNewQuestion();
   }
-});
 
-document.getElementById("answerInput").value = "";
-document.getElementById("feedback").textContent = "";
+  async loadQuestionTemplates() {
+    try {
+      const response = await fetch("q.json");
+      state.questionTemplates = await response.json();
+    } catch (error) {
+      console.error("Failed to load question templates:", error);
+    }
+  }
 
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  setupEventListeners() {
+    document
+      .getElementById("questionButton")
+      .addEventListener("click", () => this.generateNewQuestion());
+
+    document
+      .getElementById("answerButton")
+      .addEventListener("click", () => this.uiController.showAnswer());
+
+    document
+      .getElementById("randomizeButton")
+      .addEventListener("click", () => this.handleRandomize());
+
+    document
+      .getElementById("submitAnswerButton")
+      .addEventListener("click", () => this.handleSubmit());
+
+    this.uiController.elements.answerInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") this.handleSubmit();
+    });
+  }
+
+  startTimers() {
+    setInterval(() => this.uiController.updateTotalTime(), 1000);
+  }
+
+  generateNewQuestion() {
+    const { question, answer } = this.questionGenerator.generate();
+    this.uiController.displayQuestion(question, answer);
+  }
+
+  handleRandomize() {
+    this.chartManager.randomize();
+    this.generateNewQuestion();
+  }
+
+  handleSubmit() {
+    const userAnswer = this.uiController.getUserAnswer();
+    const isCorrect = AnswerValidator.isCorrect(
+      userAnswer,
+      state.currentAnswer
+    );
+
+    state.totalAttempts++;
+    if (isCorrect) state.correctCount++;
+
+    this.uiController.updateScore();
+    this.uiController.showFeedback(isCorrect);
+
+    const now = Date.now();
+    if (state.lastSubmitTime) {
+      const elapsedSeconds = (now - state.lastSubmitTime) / 1000;
+      this.uiController.updateLastTime(elapsedSeconds);
+    }
+    state.lastSubmitTime = now;
+  }
 }
 
-setInterval(() => {
-  const now = Date.now();
-  const totalSec = (now - pageStartTime) / 1000;
-  document.getElementById("total-time").textContent =
-    "Total time spent : " + formatTime(totalSec);
-}, 1000);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => new QuizApp());
+} else {
+  new QuizApp();
+}
