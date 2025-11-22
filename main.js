@@ -53,7 +53,6 @@ class ChartManager {
             labels: {
               boxWidth: 12,
               boxHeight: 12,
-              padding: 10,
             },
           },
         },
@@ -76,7 +75,7 @@ class ChartManager {
     return CONFIG.CHART.LETTERS.map((letter, index) => ({
       label: letter,
       data: this.getRandomData(),
-      borderColor: `hsl(${index * CONFIG.CHART.HUE_STEP}, 50%, 50%)`,
+      borderColor: `hsla(${index * CONFIG.CHART.HUE_STEP}, 80%, 50%, 70%)`,
       fill: false,
     }));
   }
