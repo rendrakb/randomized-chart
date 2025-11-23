@@ -335,20 +335,20 @@ class UIController {
 }
 
 class AnswerValidator {
-  static normalize(answer) {
+  static normalize(answer, expectedHasPercent = false) {
     if (answer == null) return "";
 
     let normalized = String(answer).trim().toLowerCase();
     normalized = normalized.replace(/,/g, "");
 
-    if (normalized.endsWith("%")) {
-      const num = parseFloat(normalized.replace("%", ""));
-      if (isNaN(num)) return normalized;
-      return `${Math.abs(num)}%`;
+    const num = parseFloat(normalized.replace("%", ""));
+    if (!isNaN(num)) {
+      if (expectedHasPercent) {
+        return `${Math.abs(num)}%`;
+      } else {
+        return Math.abs(num);
+      }
     }
-
-    const num = parseFloat(normalized);
-    if (!isNaN(num)) return Math.abs(num);
 
     return normalized;
   }
