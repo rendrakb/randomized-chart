@@ -52,6 +52,7 @@ class ChartManager {
         plugins: {
           legend: {
             labels: {
+              usePointStyle: true,
               boxWidth: 12,
               boxHeight: 12,
             },
@@ -73,10 +74,24 @@ class ChartManager {
   }
 
   generateDatasets() {
+    const dashPatterns = [
+      [5, 1],
+      [3, 1],
+      [3, 3],
+      [1, 3],
+      [1, 5],
+    ];
+
+    const pointStyles = ["circle", "triangle", "rect", "cross", "star"];
+
     return CONFIG.CHART.LETTERS.map((letter, index) => ({
       label: letter,
       data: this.getRandomData(),
       borderColor: `hsla(${index * CONFIG.CHART.HUE_STEP}, 80%, 50%, 70%)`,
+      borderDash: dashPatterns[index],
+      pointStyle: pointStyles[index],
+      pointRadius: 5,
+      tension: 0,
       fill: false,
     }));
   }
