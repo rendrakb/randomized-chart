@@ -75,11 +75,11 @@ class ChartManager {
 
   generateDatasets() {
     const dashPatterns = [
-      [5, 1],
-      [4, 2],
-      [3, 3],
-      [2, 4],
       [1, 5],
+      [2, 4],
+      [3, 3],
+      [4, 2],
+      [5, 1],
     ];
 
     const pointStyles = ["circle", "triangle", "rect", "cross", "star"];
