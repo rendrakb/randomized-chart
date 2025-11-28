@@ -76,9 +76,9 @@ class ChartManager {
   generateDatasets() {
     const dashPatterns = [
       [5, 1],
-      [3, 1],
+      [4, 2],
       [3, 3],
-      [1, 3],
+      [2, 4],
       [1, 5],
     ];
 
@@ -87,7 +87,7 @@ class ChartManager {
     return CONFIG.CHART.LETTERS.map((letter, index) => ({
       label: letter,
       data: this.getRandomData(),
-      borderColor: `hsla(${index * CONFIG.CHART.HUE_STEP}, 80%, 50%, 70%)`,
+      borderColor: `hsl(${index * CONFIG.CHART.HUE_STEP}, 80%, 50%)`,
       borderDash: dashPatterns[index],
       pointStyle: pointStyles[index],
       pointRadius: 5,
